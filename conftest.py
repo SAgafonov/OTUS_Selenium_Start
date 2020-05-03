@@ -49,3 +49,9 @@ def browser_in_use(request, get_browser):
         return wd
     else:
         raise ValueError("Incorrect browser")
+
+
+@pytest.fixture()
+def title_to_check():
+    page_title = "Your Store"
+    return page_title
