@@ -1,6 +1,6 @@
 import pytest
 from selenium import webdriver
-from selenium.webdriver import ChromeOptions, IeOptions, FirefoxOptions
+from selenium.webdriver import ChromeOptions, FirefoxOptions
 
 
 def pytest_addoption(parser):
@@ -16,28 +16,30 @@ def pytest_addoption(parser):
     )
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def get_url(request):
     return request.config.getoption("--url")
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def get_browser(request):
     return request.config.getoption("--browser")
 
 
-@pytest.fixture()
+@pytest.fixture(scope="class")
 def browser_in_use(request, get_browser):
     if get_browser.lower() == "chrome":
         options = ChromeOptions()
         options.add_argument('headless')
         options.add_argument('start-fullscreen')
         wd = webdriver.Chrome(options=options)
+        wd.implicitly_wait(5)
         request.addfinalizer(wd.quit)
         return wd
     elif get_browser.lower() == "ie":
         wd = webdriver.Ie()
         wd.fullscreen_window()
+        wd.implicitly_wait(5)
         request.addfinalizer(wd.quit)
         return wd
     elif get_browser.lower() == "firefox":
@@ -45,10 +47,20 @@ def browser_in_use(request, get_browser):
         options.add_argument('-headless')
         options.add_argument('-kiosk')          # full-screen mode
         wd = webdriver.Firefox(options=options)
+        wd.implicitly_wait(5)
         request.addfinalizer(wd.quit)
         return wd
     else:
         raise ValueError("Incorrect browser")
+
+
+@pytest.fixture(scope="class")
+def urls(get_url):
+    return {"main_page_url": get_url,
+            "catalog_url": get_url + "index.php?route=product/category&path=20",
+            "article_card_url": get_url + "index.php?route=product/product&path=57&product_id=49",
+            "client_login_page_url": get_url + "index.php?route=account/login",
+            "admin_login_page_url": get_url + "admin/"}
 
 
 @pytest.fixture()
