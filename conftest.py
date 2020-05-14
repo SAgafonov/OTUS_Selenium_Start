@@ -1,6 +1,8 @@
 import pytest
 from selenium import webdriver
-from selenium.webdriver import ChromeOptions, FirefoxOptions
+from selenium.webdriver import ChromeOptions, FirefoxOptions, FirefoxProfile
+from look_for_elements import FindElements
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 def pytest_addoption(parser):
@@ -30,24 +32,27 @@ def get_browser(request):
 def browser_in_use(request, get_browser):
     if get_browser.lower() == "chrome":
         options = ChromeOptions()
-        options.add_argument('headless')
-        options.add_argument('start-fullscreen')
+        options.add_argument('--headless')
+        options.add_argument('--start-fullscreen')
+        options.add_argument('--ignore-certificate-errors')
         wd = webdriver.Chrome(options=options)
-        wd.implicitly_wait(5)
+        # wd.implicitly_wait(5)
         request.addfinalizer(wd.quit)
         return wd
     elif get_browser.lower() == "ie":
         wd = webdriver.Ie()
         wd.fullscreen_window()
-        wd.implicitly_wait(5)
+        # wd.implicitly_wait(5)
         request.addfinalizer(wd.quit)
         return wd
     elif get_browser.lower() == "firefox":
         options = FirefoxOptions()
         options.add_argument('-headless')
-        options.add_argument('-kiosk')          # full-screen mode
+        options.add_argument('-kiosk')  # full-screen mode
         wd = webdriver.Firefox(options=options)
-        wd.implicitly_wait(5)
+        profile = webdriver.FirefoxProfile()
+        profile.accept_untrusted_certs = True
+        # wd.implicitly_wait(5)
         request.addfinalizer(wd.quit)
         return wd
     else:
@@ -67,3 +72,18 @@ def urls(get_url):
 def title_to_check():
     page_title = "Your Store"
     return page_title
+
+
+@pytest.fixture()
+def creds_for_admin():
+    return "user", "bitnami1"
+
+
+@pytest.fixture(scope="class")
+def initial_search(browser_in_use):
+    return FindElements(browser_in_use)
+
+
+@pytest.fixture()
+def to_perform_action(browser_in_use):
+    return ActionChains(browser_in_use)
