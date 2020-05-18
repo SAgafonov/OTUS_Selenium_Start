@@ -2,6 +2,7 @@ import pytest
 from selenium import webdriver
 from selenium.webdriver import ChromeOptions, FirefoxOptions, FirefoxProfile
 from look_for_elements import FindElements
+from preconditions import Precondition
 from selenium.webdriver.common.action_chains import ActionChains
 
 
@@ -74,14 +75,14 @@ def title_to_check():
     return page_title
 
 
-@pytest.fixture()
-def creds_for_admin():
-    return "user", "bitnami1"
-
-
 @pytest.fixture(scope="class")
 def initial_search(browser_in_use):
     return FindElements(browser_in_use)
+
+
+@pytest.fixture()
+def precondition(browser_in_use):
+    return Precondition(browser_in_use)
 
 
 @pytest.fixture()
