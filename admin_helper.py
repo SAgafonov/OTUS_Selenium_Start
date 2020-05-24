@@ -6,6 +6,7 @@ SELECTORS_GENERAL = {
     "login_selector": "[name='username']",
     "password_selector": "[name='password']",
     "user_menu_selector": ".dropdown > .dropdown-toggle",
+    "login_btn_selector": ".btn.btn-primary",
     "logout_btn_selector": "ul.nav.navbar-nav.navbar-right > li:nth-child(2)"
 }
 SELECTORS_LEFT_NAV_MENU = {
@@ -15,9 +16,15 @@ SELECTORS_LEFT_NAV_MENU = {
 SELECTORS_FOR_PRODUCTS = {
     "table_of_products_title": "div.col-md-9.col-md-pull-3.col-sm-12 h3",
     "table_of_products": "div.col-md-9.col-md-pull-3.col-sm-12 div.table-responsive table",
+    "checkbox_select_all": "input[onclick]",
+    "table_for_filtering": "#filter-product",
     "add_product_btn": ".btn.btn-primary[data-original-title='Add New']",
+    "copy_product_btn": ".btn.btn-default[data-original-title='Copy']",
     "delete_product_btn": ".btn.btn-danger[data-original-title='Delete']",
     "edit_btn": ".table.table-bordered.table-hover tbody tr:first-child td.text-right:last-child > a",
+    "filter_btn": "#button-filter",
+    "filter_input_product_name": "#input-name",
+    "filter_input_product_model": "#input-model",
     "tab_data_in_edit": "a[href='#tab-data']",
     "tab_special_in_edit": "a[href='#tab-special']",
     "tab_image_in_edit": "a[href='#tab-image']",
