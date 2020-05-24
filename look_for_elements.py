@@ -43,3 +43,11 @@ class FindElements:
             return self.driver.find_elements(locator, selector)
         except TimeoutException:
             raise AssertionError("Element '{}' is not appeared in {} seconds".format(selector, timeout))
+
+    def alert_accept(self, timeout=3):
+        try:
+            WebDriverWait(self.driver, timeout).until(EC.alert_is_present())
+            alert = self.driver.switch_to.alert
+            alert.accept()
+        except TimeoutException:
+            raise AssertionError("Element alert popup is not appeared in {} seconds".format(timeout))
