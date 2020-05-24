@@ -34,7 +34,8 @@ def get_browser(request):
 def browser_in_use(request, get_browser):
     if get_browser.lower() == "chrome":
         options = ChromeOptions()
-        # options.add_argument('--headless')
+        options.add_argument('--headless')
+        options.add_argument('--window-size=1200x600')  # Исправляет ошибку, когде не видны элементы поиска продукта в headless режимек
         options.add_argument('--start-fullscreen')
         options.add_argument('--ignore-certificate-errors')
         wd = webdriver.Chrome(options=options)

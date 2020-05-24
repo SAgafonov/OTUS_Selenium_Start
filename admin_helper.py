@@ -17,7 +17,7 @@ SELECTORS_FOR_PRODUCTS = {
     "table_of_products_title": "div.col-md-9.col-md-pull-3.col-sm-12 h3",
     "table_of_products": "div.col-md-9.col-md-pull-3.col-sm-12 div.table-responsive table",
     "checkbox_select_all": "input[onclick]",
-    "table_for_filtering": "#filter-product",
+    "table_for_filtering": ".row .panel.panel-default .panel-body",
     "add_product_btn": ".btn.btn-primary[data-original-title='Add New']",
     "copy_product_btn": ".btn.btn-default[data-original-title='Copy']",
     "delete_product_btn": ".btn.btn-danger[data-original-title='Delete']",

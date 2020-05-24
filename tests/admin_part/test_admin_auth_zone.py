@@ -12,10 +12,12 @@ class TestAuthorization:
         assert admin_login_page.look_for_element(locator, SELECTORS_GENERAL["user_menu_selector"]).text == "John Doe"
         assert admin_login_page.look_for_element(locator, SELECTORS_GENERAL["logout_btn_selector"])
 
+
+class TestProducts:
+
     @pytest.mark.parametrize("locator", [By.CSS_SELECTOR])
     def test_go_to_products(self, admin_product_page, locator):
-        if not admin_product_page.look_for_element(locator, SELECTORS_GENERAL["logout_btn_selector"]):
-            admin_product_page.login()
+        admin_product_page.login()
         admin_product_page.admin_navigate_to_products()
         assert admin_product_page.look_for_element(locator, SELECTORS_FOR_PRODUCTS["table_of_products_title"]).text == "Product List"
         assert admin_product_page.look_for_element(locator, SELECTORS_FOR_PRODUCTS["table_of_products"])
@@ -67,7 +69,7 @@ class TestAuthorization:
 
     @pytest.mark.parametrize("locator", [By.CSS_SELECTOR])
     def test_filter_form_exists(self, admin_product_page, locator):
-        assert admin_product_page.look_for_element(locator, SELECTORS_FOR_PRODUCTS["table_for_filtering"])
+        assert admin_product_page.driver.find_element_by_css_selector(SELECTORS_FOR_PRODUCTS["table_for_filtering"])
 
     @pytest.mark.parametrize("locator", [By.CSS_SELECTOR])
     def test_filter_by_name(self, admin_product_page, locator):
@@ -89,6 +91,7 @@ class TestAuthorization:
     def test_delete_all(self, admin_product_page, locator):
         admin_product_page.delete_all_products()
         assert admin_product_page.look_for_element(locator, "tbody tr").text == "No results!"
+        admin_product_page.create_product()
 
     @pytest.mark.parametrize("locator", [By.CSS_SELECTOR])
     def test_logout(self, admin_login_page, locator):
