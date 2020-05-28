@@ -1,6 +1,7 @@
 import pytest
 from selenium import webdriver
 from selenium.webdriver import ChromeOptions, FirefoxOptions, FirefoxProfile
+from pages.admin_part import AdminLoginPage, AdminProductPage
 from look_for_elements import FindElements
 from preconditions import Precondition
 from selenium.webdriver.common.action_chains import ActionChains
@@ -34,6 +35,7 @@ def browser_in_use(request, get_browser):
     if get_browser.lower() == "chrome":
         options = ChromeOptions()
         options.add_argument('--headless')
+        options.add_argument('--window-size=1200x600')  # Исправляет ошибку, когде не видны элементы поиска продукта в headless режимек
         options.add_argument('--start-fullscreen')
         options.add_argument('--ignore-certificate-errors')
         wd = webdriver.Chrome(options=options)
@@ -73,6 +75,16 @@ def urls(get_url):
 def title_to_check():
     page_title = "Your Store"
     return page_title
+
+
+@pytest.fixture()
+def admin_login_page(browser_in_use, urls):
+    return AdminLoginPage(browser_in_use, urls["admin_login_page_url"])
+
+
+@pytest.fixture()
+def admin_product_page(browser_in_use, urls):
+    return AdminProductPage(browser_in_use, urls["admin_login_page_url"])
 
 
 @pytest.fixture(scope="class")
