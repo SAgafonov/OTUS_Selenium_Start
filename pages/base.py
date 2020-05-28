@@ -4,12 +4,15 @@ from selenium.common.exceptions import TimeoutException
 
 
 class BasePage:
-    def __init__(self, driver, url):
+    def __init__(self, driver, url=None):
         self.driver = driver
         self.url = url
 
-    def open_page(self):
-        self.driver.get(self.url)
+    def open_page(self, url=None):
+        if url:
+            self.driver.get(url)
+        else:
+            self.driver.get(self.url)
 
     def look_for_element(self, locator, selector, attribute=None, timeout=5):
         """

@@ -1,6 +1,5 @@
 import pytest
-import random
-from admin_helper import SELECTORS_FOR_PRODUCTS, SELECTORS_GENERAL, SELECTORS_LEFT_NAV_MENU, USERNAME, PASSWORD
+from admin_helper import CSS_SELECTORS_FOR_PRODUCTS, CSS_SELECTORS_GENERAL, CSS_SELECTORS_LEFT_NAV_MENU
 from selenium.webdriver.common.by import By
 
 
@@ -9,8 +8,14 @@ class TestAuthorization:
     @pytest.mark.parametrize("locator", [By.CSS_SELECTOR])
     def test_login(self, admin_login_page, locator):
         admin_login_page.login()
-        assert admin_login_page.look_for_element(locator, SELECTORS_GENERAL["user_menu_selector"]).text == "John Doe"
-        assert admin_login_page.look_for_element(locator, SELECTORS_GENERAL["logout_btn_selector"])
+        assert admin_login_page.look_for_element(locator, CSS_SELECTORS_GENERAL["user_menu_selector"]).text == "John Doe"
+        assert admin_login_page.look_for_element(locator, CSS_SELECTORS_GENERAL["logout_btn_selector"])
+
+    @pytest.mark.parametrize("locator", [By.CSS_SELECTOR])
+    def test_logout(self, admin_login_page, locator):
+        admin_login_page.logout()
+        assert admin_login_page.look_for_element(locator, CSS_SELECTORS_GENERAL["login_form_selector"])
+        assert admin_login_page.look_for_element(locator, CSS_SELECTORS_GENERAL["login_selector"])
 
 
 class TestProducts:
@@ -19,8 +24,8 @@ class TestProducts:
     def test_go_to_products(self, admin_product_page, locator):
         admin_product_page.login()
         admin_product_page.admin_navigate_to_products()
-        assert admin_product_page.look_for_element(locator, SELECTORS_FOR_PRODUCTS["table_of_products_title"]).text == "Product List"
-        assert admin_product_page.look_for_element(locator, SELECTORS_FOR_PRODUCTS["table_of_products"])
+        assert admin_product_page.look_for_element(locator, CSS_SELECTORS_FOR_PRODUCTS["table_of_products_title"]).text == "Product List"
+        assert admin_product_page.look_for_element(locator, CSS_SELECTORS_FOR_PRODUCTS["table_of_products"])
 
     @pytest.mark.parametrize("locator", [By.CSS_SELECTOR])
     def test_edit_product(self, admin_product_page, locator):
@@ -69,7 +74,7 @@ class TestProducts:
 
     @pytest.mark.parametrize("locator", [By.CSS_SELECTOR])
     def test_filter_form_exists(self, admin_product_page, locator):
-        assert admin_product_page.driver.find_element_by_css_selector(SELECTORS_FOR_PRODUCTS["table_for_filtering"])
+        assert admin_product_page.driver.find_element_by_css_selector(CSS_SELECTORS_FOR_PRODUCTS["table_for_filtering"])
 
     @pytest.mark.parametrize("locator", [By.CSS_SELECTOR])
     def test_filter_by_name(self, admin_product_page, locator):
@@ -93,8 +98,7 @@ class TestProducts:
         assert admin_product_page.look_for_element(locator, "tbody tr").text == "No results!"
         admin_product_page.create_product()
 
-    @pytest.mark.parametrize("locator", [By.CSS_SELECTOR])
-    def test_logout(self, admin_login_page, locator):
-        admin_login_page.logout()
-        assert admin_login_page.look_for_element(locator, SELECTORS_GENERAL["login_form_selector"])
-        assert admin_login_page.look_for_element(locator, SELECTORS_GENERAL["login_selector"])
+    def test_add_3_pictures_to_product(self, admin_product_page):
+        admin_product_page.login()
+        admin_product_page.admin_navigate_to_products()
+        admin_product_page.upload_image()
