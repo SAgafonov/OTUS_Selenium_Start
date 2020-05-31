@@ -1,6 +1,8 @@
 USERNAME = "user"
 PASSWORD = "bitnami1"
 
+ADMIN_SUB_URL = "admin/"
+
 CSS_SELECTORS_GENERAL = {
     "main_logo": ".navbar-brand img",
     "login_form_selector": "div.panel-body form",
