@@ -1,7 +1,10 @@
 USERNAME = "user"
 PASSWORD = "bitnami1"
 
-SELECTORS_GENERAL = {
+ADMIN_SUB_URL = "admin/"
+
+CSS_SELECTORS_GENERAL = {
+    "main_logo": ".navbar-brand img",
     "login_form_selector": "div.panel-body form",
     "login_selector": "[name='username']",
     "password_selector": "[name='password']",
@@ -9,11 +12,11 @@ SELECTORS_GENERAL = {
     "login_btn_selector": ".btn.btn-primary",
     "logout_btn_selector": "ul.nav.navbar-nav.navbar-right > li:nth-child(2)"
 }
-SELECTORS_LEFT_NAV_MENU = {
+CSS_SELECTORS_LEFT_NAV_MENU = {
     "catalog_element": "#menu > #menu-catalog",
     "product_element": "li#menu-catalog > ul#collapse1 li:nth-child(2)"
 }
-SELECTORS_FOR_PRODUCTS = {
+CSS_SELECTORS_FOR_PRODUCTS = {
     "table_of_products_title": "div.col-md-9.col-md-pull-3.col-sm-12 h3",
     "table_of_products": "div.col-md-9.col-md-pull-3.col-sm-12 div.table-responsive table",
     "checkbox_select_all": "input[onclick]",
@@ -28,6 +31,9 @@ SELECTORS_FOR_PRODUCTS = {
     "tab_data_in_edit": "a[href='#tab-data']",
     "tab_special_in_edit": "a[href='#tab-special']",
     "tab_image_in_edit": "a[href='#tab-image']",
+    "image_in_edit": "td.text-left > a#thumb-image > img",
+    "btn_to_add_image": "#button-image",
+    "btn_to_upload_image": "#button-upload",
     "save_btn": "button[data-original-title='Save']",
     "prod_img": ".table.table-bordered.table-hover tbody tr:first-child td:nth-child(2)",
     "prod_name": ".table.table-bordered.table-hover tbody tr:first-child td:nth-child(3)",
@@ -42,6 +48,5 @@ SELECTORS_FOR_PRODUCTS = {
     "status_in_edit": "#input-status",
     "price_in_edit": "input#input-price",
     "quantity_in_edit": "input#input-quantity",
-    "special_price_in_edit": "input[name='product_special[0][price]']",
-    "image_in_edit": "td.text-left > a#thumb-image > img"
+    "special_price_in_edit": "input[name='product_special[0][price]']"
 }
