@@ -1,6 +1,7 @@
 import logging
 import pytest
 from helpers.event_listener import MyListener
+from helpers.define_executor import Executor
 from helpers.general_settings import PATH_TO_LOGS
 from selenium import webdriver
 from selenium.webdriver import ChromeOptions, FirefoxOptions, FirefoxProfile
@@ -36,7 +37,20 @@ def pytest_addoption(parser):
         "--browser",
         required=False,
         default="chrome",
+        choices=["chrome", "ie", "firefox"],
         help="Browser to test. Available browsers: Chrome, IE, Firefox"
+    )
+    parser.addoption(
+        "--remote_type",
+        required=False,
+        default="local",
+        choices=["local", "local_grid", "cloud"],
+        help="Defines how to run tests: locally, using grid or cloud service. Available values: local, local_grid, cloud"
+    )
+    parser.addoption(
+        "--executor-url",
+        required=False,
+        help="Defines URL where tests will be executed"
     )
 
 
@@ -50,45 +64,22 @@ def get_browser(request):
     return request.config.getoption("--browser")
 
 
-@pytest.fixture(scope="class")
-def browser_in_use(request, get_browser):
-    if get_browser.lower() == "chrome":
-        caps = DesiredCapabilities.CHROME
-        caps["loggingPrefs"] = {"performance": "ALL", "browser": "ALL"}
-        options = ChromeOptions()
-        options.add_argument('--headless')
-        options.add_argument('--window-size=1200x600')  # Исправляет ошибку, когде не видны элементы фильтра продукта в headless режиме
-        options.add_argument('--start-fullscreen')
-        options.add_argument('--ignore-certificate-errors')
-        options.add_experimental_option("w3c", False)
-        wd = EventFiringWebDriver(webdriver.Chrome(
-            options=options,
-            desired_capabilities=caps,
-            service_log_path=PATH_TO_LOGS + "chrome_logs.log"
-            ), MyListener()
-        )
-        # wd.implicitly_wait(5)
-        request.addfinalizer(wd.quit)
-        return wd
+@pytest.fixture(scope="module")
+def get_remote_type(request):
+    return request.config.getoption("--remote_type")
 
-    elif get_browser.lower() == "ie":
-        wd = webdriver.Ie()
-        wd.fullscreen_window()
-        # wd.implicitly_wait(5)
-        request.addfinalizer(wd.quit)
-        return wd
-    elif get_browser.lower() == "firefox":
-        options = FirefoxOptions()
-        options.add_argument('-headless')
-        options.add_argument('-kiosk')  # full-screen mode
-        wd = webdriver.Firefox(options=options, service_log_path=PATH_TO_LOGS + "geckodriver.log")
-        profile = webdriver.FirefoxProfile()
-        profile.accept_untrusted_certs = True
-        # wd.implicitly_wait(5)
-        request.addfinalizer(wd.quit)
-        return wd
-    else:
-        raise ValueError("Incorrect browser")
+
+@pytest.fixture(scope="module")
+def get_executor_url(request):
+    return request.config.getoption("--executor-url")
+
+
+@pytest.fixture(scope="class")
+def browser_in_use(request, get_browser, get_remote_type, get_executor_url):
+    e = Executor(get_browser.lower(), get_remote_type.lower(), get_executor_url)
+    wd = e.determine_webdriver()
+    request.addfinalizer(wd.quit)
+    return wd
 
 
 @pytest.fixture()
