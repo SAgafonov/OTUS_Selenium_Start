@@ -16,5 +16,5 @@ pytest tests/{package_name}
 pytest tests/{package_name} --remote_type={type} --executor-url={url} 
 ```
 <div>'remote_type' accepts "local", "local_grid", "cloud". For "local_grid", "cloud" options 'executor-url' must be provided</div>
-<div>"local" means no grid.</div>
+"local" means no grid.
 <div>In 'executor-url' the URL where tests will be executed should be provided</div>

@@ -1,6 +1,6 @@
+import allure
 import logging
 import random
-import time
 from helpers.admin_helper import CSS_SELECTORS_FOR_PRODUCTS, CSS_SELECTORS_GENERAL, CSS_SELECTORS_LEFT_NAV_MENU, \
     USERNAME, PASSWORD, ADMIN_SUB_URL
 from .base import BasePage
@@ -16,6 +16,7 @@ class AdminLoginPage(BasePage):
         super().__init__(driver=driver, url=self.url)
         logger.debug("AdminLoginPage class is initialized")
 
+    @allure.step("Enter username")
     def _set_username_(self):
         # To test logging console output
         self.driver.execute_script("console.log('TEEEEEEEEEEEEEEEEEEEEEEEEEEEEST')")
@@ -28,6 +29,7 @@ class AdminLoginPage(BasePage):
         logger.info("Enter username")
         login_input.send_keys(USERNAME)
 
+    @allure.step("Enter password")
     def _set_password_(self):
         logger.debug("Look for password field '{}' selector".format(CSS_SELECTORS_GENERAL["password_selector"]))
         password_input = self.look_for_element(selector=CSS_SELECTORS_GENERAL["password_selector"])
@@ -37,6 +39,7 @@ class AdminLoginPage(BasePage):
         logger.info("Enter password")
         password_input.send_keys(PASSWORD)
 
+    @allure.step("Log in admin panel")
     def login(self):
         logger.info("Open login page")
         self.open_page()
@@ -47,6 +50,7 @@ class AdminLoginPage(BasePage):
         logger.info("Press button to authorize")
         self.look_for_element(selector=CSS_SELECTORS_GENERAL["login_btn_selector"]).click()
 
+    @allure.step("Log out from admin panel")
     def logout(self):
         logger.info("Click 'Log out' button")
         self.look_for_element(selector=CSS_SELECTORS_GENERAL["logout_btn_selector"]).click()
@@ -70,6 +74,7 @@ class AdminProductPage(AdminLoginPage):
             for i in range(num_of_companies_to_create):
                 self.create_product()
 
+    @allure.step("Go to 'Products' page")
     def admin_navigate_to_products(self):
         logger.debug("Check if in authorized zone")
         self.check_if_authorized()
@@ -83,6 +88,7 @@ class AdminProductPage(AdminLoginPage):
         logger.info("Go to 'Products' page")
         path_to_product.click()
 
+    @allure.step("Create a product")
     def create_product(self):
         if self.driver.title != "Products":
             self.check_if_authorized()
@@ -101,17 +107,20 @@ class AdminProductPage(AdminLoginPage):
         logger.info("Click 'Add product' button")
         add_product_btn.click()
         logger.info("Fill in fields using JS")
-        for key in text_fields_to_be_created:
-            self.driver.execute_script(
-                f"$(\"{CSS_SELECTORS_FOR_PRODUCTS[key]}\")[0].value = \"{text_fields_to_be_created.get(key)}\";")
+        with allure.step("Key in values to required fields"):
+            for key in text_fields_to_be_created:
+                self.driver.execute_script(
+                    f"$(\"{CSS_SELECTORS_FOR_PRODUCTS[key]}\")[0].value = \"{text_fields_to_be_created.get(key)}\";")
 
         logger.debug("Look for 'Save' button using '{}' selector".format(CSS_SELECTORS_FOR_PRODUCTS["save_btn"]))
         save_btn = self.look_for_element(selector=CSS_SELECTORS_FOR_PRODUCTS["save_btn"])
         logger.debug("'Save' button is found")
         logger.info("Click 'Save' button")
-        save_btn.click()
+        with allure.step("Save a product"):
+            save_btn.click()
         return text_fields_to_be_created
 
+    @allure.step("Edit a product")
     def edit_product(self):
         if self.driver.title != "Products":
             self.check_if_authorized()
@@ -132,17 +141,20 @@ class AdminProductPage(AdminLoginPage):
         edit_btn.click()
 
         logger.info("Fill in fields using JS")
-        for key in text_fields_to_be_changed:
-            self.driver.execute_script(
-                f"$(\"{CSS_SELECTORS_FOR_PRODUCTS[key]}\")[0].value = \"{text_fields_to_be_changed.get(key)}\";")
+        with allure.step("Key in values to required fields"):
+            for key in text_fields_to_be_changed:
+                self.driver.execute_script(
+                    f"$(\"{CSS_SELECTORS_FOR_PRODUCTS[key]}\")[0].value = \"{text_fields_to_be_changed.get(key)}\";")
 
         logger.debug("Look for 'Save' button using '{}' selector".format(CSS_SELECTORS_FOR_PRODUCTS["save_btn"]))
         save_btn = self.look_for_element(selector=CSS_SELECTORS_FOR_PRODUCTS["save_btn"])
         logger.debug("'Save' button is found")
         logger.info("Click 'Save' button")
-        save_btn.click()
+        with allure.step("Save a changes"):
+            save_btn.click()
         return text_fields_to_be_changed
 
+    @allure.step("Delete a product")
     def delete_product(self, name: str = None) -> str:
         """
         Delete either first product or product which name is passed as an argument
@@ -172,27 +184,33 @@ class AdminProductPage(AdminLoginPage):
                     select_product_chck_box = row.find_element_by_css_selector("td:nth-child(1)")
 
         logger.info("Select a check-box for the '{}' product".format(name_of_deleted_product))
-        select_product_chck_box.click()
+        with allure.step("Select a product to be deleted"):
+            select_product_chck_box.click()
         logger.debug("Look for 'Delete' button using '{}' selector".format(CSS_SELECTORS_FOR_PRODUCTS["delete_product_btn"]))
         del_btn = self.look_for_element(selector=CSS_SELECTORS_FOR_PRODUCTS["delete_product_btn"])
         logger.debug("'Delete' button is found")
         logger.info("Click 'Delete' button")
-        del_btn.click()
+        with allure.step("Delete a product"):
+            del_btn.click()
         self.alert_accept()
         return name_of_deleted_product
 
+    @allure.step("Delete all products")
     def delete_all_products(self):
         if self.driver.title != "Products":
             self.check_if_authorized()
             self.admin_navigate_to_products()
 
         logger.info("Select all products")
-        self.look_for_element(selector=CSS_SELECTORS_FOR_PRODUCTS["checkbox_select_all"]).click()
+        with allure.step("Select all products"):
+            self.look_for_element(selector=CSS_SELECTORS_FOR_PRODUCTS["checkbox_select_all"]).click()
         logger.info("Click 'Delete' button")
-        self.look_for_element(selector=CSS_SELECTORS_FOR_PRODUCTS["delete_product_btn"]).click()
+        with allure.step("Delete all products"):
+            self.look_for_element(selector=CSS_SELECTORS_FOR_PRODUCTS["delete_product_btn"]).click()
         logger.info("Accept alert")
         self.alert_accept()
 
+    @allure.step("Copy a product")
     def copy_product(self):
         if self.driver.title != "Products":
             self.check_if_authorized()
@@ -205,14 +223,17 @@ class AdminProductPage(AdminLoginPage):
         name_of_copied_product = rows_of_products_table[0].find_element_by_css_selector("td:nth-child(3)").text
         logger.debug("Select a product to be copied")
         select_product_chck_box = rows_of_products_table[0].find_element_by_css_selector("td:nth-child(1)")
-        select_product_chck_box.click()
+        with allure.step("Select a product to copy"):
+            select_product_chck_box.click()
         logger.debug("Look for 'Copy' button using '{}' selector".format(CSS_SELECTORS_FOR_PRODUCTS["copy_product_btn"]))
         copy_btn = self.look_for_element(selector=CSS_SELECTORS_FOR_PRODUCTS["copy_product_btn"])
         logger.debug("'Copy' button is found")
         logger.info("Click 'Copy' button")
-        copy_btn.click()
+        with allure.step("Copy a product"):
+            copy_btn.click()
         return name_of_copied_product
 
+    @allure.step("Filter products")
     def filter_product(self, field_to_filter_by):
         if self.driver.title != "Products":
             self.check_if_authorized()
@@ -236,13 +257,17 @@ class AdminProductPage(AdminLoginPage):
             raise ValueError("Incorrect filter field. Must be 'name' or 'model'")
 
         logger.info("Clear filter field")
-        input_field.clear()
+        with allure.step("Clear input field"):
+            input_field.clear()
         logger.info("Fill in filter field")
-        input_field.send_keys(text_to_filter_by)
+        with allure.step("Enter text to filter by"):
+            input_field.send_keys(text_to_filter_by)
         logger.info("Click 'Filter' button")
-        self.look_for_element(selector=CSS_SELECTORS_FOR_PRODUCTS["filter_btn"]).click()
+        with allure.step("Filtering"):
+            self.look_for_element(selector=CSS_SELECTORS_FOR_PRODUCTS["filter_btn"]).click()
         return text_to_filter_by
 
+    @allure.step("Set default state of filtration")
     def remove_filtration(self, field_to_filter_by):
         if field_to_filter_by == "name":
             logger.debug("Get input field to filter using '{}' selector".format(CSS_SELECTORS_FOR_PRODUCTS["filter_input_product_name"]))

@@ -1,4 +1,6 @@
+import allure
 import logging
+from helpers.general_settings import PATH_TO_LOGS
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
@@ -29,14 +31,18 @@ class BasePage:
         """
         print(locator)
         try:
-            # logger.debug("Look for element using '{}' locator and '{}' selector".format(locator, selector))
+            logger.debug("Look for element using '{}' locator and '{}' selector".format(locator, selector))
             WebDriverWait(self.driver, timeout).until(EC.visibility_of_element_located((locator, selector)))
             if attribute:
                 logger.debug("Return attributes of the element which has '{}' selector".format(selector))
                 return self.driver.find_element(locator, selector).get_attribute(attribute)
             return self.driver.find_element(locator, selector)
         except TimeoutException:
-            # logger.exception("Element '{}' is not appeared in {} seconds".format(selector, timeout))
+            logger.exception("Element '{}' is not appeared in {} seconds".format(selector, timeout))
+            allure.attach(body=self.driver.get_screenshot_as_png(),
+                          attachment_type=allure.attachment_type.PNG)
+            allure.attach.file(source=PATH_TO_LOGS + "chrome_logs.log",
+                               attachment_type=allure.attachment_type.TEXT)
             raise AssertionError("Element '{}' is not appeared in {} seconds".format(selector, timeout))
 
     def look_for_elements(self, selector, locator=By.CSS_SELECTOR, timeout=5):
@@ -54,8 +60,13 @@ class BasePage:
             return self.driver.find_elements(locator, selector)
         except TimeoutException:
             logger.exception("Element '{}' is not appeared in {} seconds".format(selector, timeout))
+            allure.attach(body=self.driver.get_screenshot_as_png(),
+                          attachment_type=allure.attachment_type.PNG)
+            allure.attach.file(source=PATH_TO_LOGS + "chrome_logs.log",
+                               attachment_type=allure.attachment_type.TEXT)
             raise AssertionError("Element '{}' is not appeared in {} seconds".format(selector, timeout))
 
+    @allure.step("Accept browser alert")
     def alert_accept(self, timeout=3):
         try:
             logger.debug("Wait until alert is appeared")
@@ -66,4 +77,8 @@ class BasePage:
             alert.accept()
         except TimeoutException:
             logger.exception("Element alert popup is not appeared in {} seconds".format(timeout))
+            allure.attach(body=self.driver.get_screenshot_as_png(),
+                          attachment_type=allure.attachment_type.PNG)
+            allure.attach.file(source=PATH_TO_LOGS + "chrome_logs.log",
+                               attachment_type=allure.attachment_type.TEXT)
             raise AssertionError("Element alert popup is not appeared in {} seconds".format(timeout))
