@@ -12,7 +12,7 @@ class Executor:
         the way how to execute tests either locally, using local grid or in cloud
     """
 
-    def __init__(self, browser: str, remote_type: str, executor_url:str ):
+    def __init__(self, browser: str, remote_type: str, executor_url: str):
         self._browser = browser
         self._remote_type = remote_type
         self._options = None
@@ -37,6 +37,7 @@ class Executor:
             options.add_argument('-headless')
             options.add_argument('-kiosk')  # full-screen mode
             self._options = options
+            self._caps = {}
 
     def determine_webdriver(self):
         wd = None
@@ -74,6 +75,21 @@ class Executor:
                 # 'browser': 'Chrome',
                 # 'browser_version': '80',
                 'name': "Upload_File_New"
+            }
+            self._caps = {**self._caps, **desired_cap}
+            wd = webdriver.Remote(command_executor=self._executor_url,
+                                  desired_capabilities=self._caps,
+                                  options=self._options)
+        elif self._remote_type == "selenoid":
+            if not self._executor_url:
+                self._executor_url = "http://localhost:4444/wd/hub"
+            desired_cap = {
+                'browserName': self._browser,
+                # 'version': "65.0",
+                # 'enableVnc': True,
+                # 'enableVideo': True,
+                # 'enableLog': True,
+                'name': "Selenoid"
             }
             self._caps = {**self._caps, **desired_cap}
             wd = webdriver.Remote(command_executor=self._executor_url,

@@ -8,7 +8,7 @@ CSS_SELECTORS_GENERAL = {
     "login_form_selector": "div.panel-body form",
     "login_selector": "[name='username']",
     "password_selector": "[name='password']",
-    "user_menu_selector": ".dropdown > .dropdown-toggle",
+    "user_menu_selector": ".dropdown > .dropdown-toggl",
     "login_btn_selector": ".btn.btn-primary",
     "logout_btn_selector": "ul.nav.navbar-nav.navbar-right > li:nth-child(2)"
 }
