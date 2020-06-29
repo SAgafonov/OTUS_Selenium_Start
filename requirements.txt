@@ -1,4 +1,5 @@
 mysql-connector-python==8.0.20
+allure-pytest==2.8.16
 pytest==5.4.3
 pytest-xdist==1.32.0
 requests==2.24.0

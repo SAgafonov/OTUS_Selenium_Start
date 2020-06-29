@@ -32,7 +32,7 @@ def pytest_addoption(parser):
     parser.addoption(
         "--url",
         required=False,
-        default="http://localhost/",
+        default="http://localhost/", # url=https://demo.opencart.com/ - remote opencart
         help="Request URL"
     )
     parser.addoption(
@@ -46,8 +46,9 @@ def pytest_addoption(parser):
         "--remote_type",
         required=False,
         default="local",
-        choices=["local", "local_grid", "cloud"],
-        help="Defines how to run tests: locally, using grid or cloud service. Available values: local, local_grid, cloud"
+        choices=["local", "local_grid", "cloud", "selenoid"],
+        help="Defines how to run tests: locally, using grid, cloud service or selenoid. "
+             "Available values: local, local_grid, cloud, selenoid"
     )
     parser.addoption(
         "--executor-url",
