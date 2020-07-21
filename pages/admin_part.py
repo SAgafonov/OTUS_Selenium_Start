@@ -1,6 +1,7 @@
 import allure
 import logging
 import random
+from helpers.db_connector import DBConnector
 from helpers.admin_helper import CSS_SELECTORS_FOR_PRODUCTS, CSS_SELECTORS_GENERAL, CSS_SELECTORS_LEFT_NAV_MENU, \
     USERNAME, PASSWORD, ADMIN_SUB_URL
 from .base import BasePage
@@ -14,6 +15,7 @@ class AdminLoginPage(BasePage):
         self.driver = driver
         self.url = url + ADMIN_SUB_URL
         super().__init__(driver=driver, url=self.url)
+        self.db = DBConnector()
         logger.debug("AdminLoginPage class is initialized")
 
     @allure.step("Enter username")
@@ -134,6 +136,11 @@ class AdminProductPage(AdminLoginPage):
         }
 
         self.check_if_table_with_products_is_not_empty(num_of_companies_to_create=3)
+        logger.debug("Get name of a first product")
+        first_prod_name = self.look_for_element(selector=CSS_SELECTORS_FOR_PRODUCTS["prod_name"]).text
+        logger.debug("Get ID of the product that will be edited")
+        edited_prod_id = self.db.select_method("SELECT product_id FROM oc_product_description "
+                                               "WHERE name='{name}';".format(name=first_prod_name))[0][0]
         logger.debug("Look for 'Edit product' button using '{}' selector".format(CSS_SELECTORS_FOR_PRODUCTS["edit_btn"]))
         edit_btn = self.look_for_element(selector=CSS_SELECTORS_FOR_PRODUCTS["edit_btn"])
         logger.debug("'Edit product' button is found")
@@ -152,25 +159,31 @@ class AdminProductPage(AdminLoginPage):
         logger.info("Click 'Save' button")
         with allure.step("Save a changes"):
             save_btn.click()
-        return text_fields_to_be_changed
+        return text_fields_to_be_changed, edited_prod_id
 
     @allure.step("Delete a product")
-    def delete_product(self, name: str = None) -> str:
+    def delete_product(self, name: str = None) -> tuple:
         """
         Delete either first product or product which name is passed as an argument
         :param name: string: name of a product which should be deleted
-        :return: name of a deleted product
+        :return: tuple: name of a deleted product and ID of a deleted product
         """
+        deleted_prod_id = None
+        select_product_chck_box = None
         if self.driver.title != "Products":
             self.check_if_authorized()
             self.admin_navigate_to_products()
 
         self.check_if_table_with_products_is_not_empty(num_of_companies_to_create=3)
+        self.driver.refresh()
         rows_of_products_table = self.look_for_elements(selector="tbody tr")
         if not name:
             logger.debug("Name of product to be deleted is NOT provided")
             logger.debug("Select first product to be deleted")
             name_of_deleted_product = rows_of_products_table[0].find_element_by_css_selector("td:nth-child(3)").text
+            logger.debug("Get ID of the product that will be deleted")
+            deleted_prod_id = self.db.select_method("SELECT product_id FROM oc_product_description "
+                                                   "WHERE name='{name}';".format(name=name_of_deleted_product))[0][0]
             select_product_chck_box = rows_of_products_table[0].find_element_by_css_selector("td:nth-child(1)")
         else:
             logger.debug("Name of product to be deleted is provided")
@@ -181,7 +194,13 @@ class AdminProductPage(AdminLoginPage):
                 if name_of_deleted_product == row.find_element_by_css_selector(
                         "td:nth-child(3)").text:
                     logger.debug("Product '{}' is found".format(name_of_deleted_product))
+                    logger.debug("Get ID of the product that will be deleted")
+                    deleted_prod_id = self.db.select_method("SELECT product_id FROM oc_product_description "
+                                                            "WHERE name='{name}';".format(name=name_of_deleted_product))[0][0]
                     select_product_chck_box = row.find_element_by_css_selector("td:nth-child(1)")
+                    logger.debug("{}", select_product_chck_box)
+                else:
+                    logger.debug("Product '{}' is NOT found".format(name_of_deleted_product))
 
         logger.info("Select a check-box for the '{}' product".format(name_of_deleted_product))
         with allure.step("Select a product to be deleted"):
@@ -193,7 +212,7 @@ class AdminProductPage(AdminLoginPage):
         with allure.step("Delete a product"):
             del_btn.click()
         self.alert_accept()
-        return name_of_deleted_product
+        return name_of_deleted_product, deleted_prod_id
 
     @allure.step("Delete all products")
     def delete_all_products(self):
@@ -201,6 +220,7 @@ class AdminProductPage(AdminLoginPage):
             self.check_if_authorized()
             self.admin_navigate_to_products()
 
+        self.check_if_table_with_products_is_not_empty(num_of_companies_to_create=3)
         logger.info("Select all products")
         with allure.step("Select all products"):
             self.look_for_element(selector=CSS_SELECTORS_FOR_PRODUCTS["checkbox_select_all"]).click()

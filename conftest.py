@@ -1,8 +1,10 @@
 import logging
 import pytest
+import random
 from helpers.event_listener import MyListener
 from helpers.define_executor import Executor
 from helpers.general_settings import PATH_TO_LOGS
+from helpers.db_connector import DBConnector
 from selenium import webdriver
 from selenium.webdriver import ChromeOptions, FirefoxOptions, FirefoxProfile
 from pages.admin_part import AdminLoginPage, AdminProductPage
@@ -107,3 +109,34 @@ def client_not_authorized_zone(browser_in_use, get_url):
 @pytest.fixture()
 def to_perform_action(browser_in_use):
     return ActionChains(browser_in_use)
+
+
+@pytest.fixture()
+def my_db():
+    return DBConnector()
+
+
+@pytest.fixture()
+def get_from_db(my_db):
+
+    def _exec_select(query):
+        return my_db.select_method(query)
+    return _exec_select
+
+
+@pytest.fixture()
+def insert_product_in_db(my_db):
+    product_id = random.randint(0, 999999999)
+    oc_product = "INSERT INTO oc_product " \
+                 "(product_id, model, sku, upc, ean, jan, isbn, mpn, location, quantity, stock_status_id, image, manufacturer_id," \
+                 "shipping, price, points, tax_class_id, date_available, weight, weight_class_id, length, width, height," \
+                 "length_class_id, subtract, minimum, sort_order, status, viewed, date_added, date_modified) " \
+                 "VALUES" \
+                 "({id}, 'TEST123_{id}', '', '', '', '', '', '', '', 50, 6, '', 0," \
+                 "1, 1000.0000, 0, 0, '2020-06-14', 0.00000000, 1, 0.00000000, 0.00000000, 0.00000000," \
+                 "1, 1, 1, 1, 1, 0, '2020-06-14 23:33:51', '2020-06-29 16:55:11');".format(id=product_id)
+    oc_product_description = "INSERT INTO oc_product_description " \
+                             "(product_id, language_id, name, description, tag, meta_title, meta_description, meta_keyword) " \
+                             "VALUES ({id}, 1, 'TEST123_{id}', '', '', 'TeST_12334_{id}', '', '');".format(id=product_id)
+    my_db.insert_method(oc_product_description, oc_product)
+    return product_id
