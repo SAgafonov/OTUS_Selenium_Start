@@ -82,7 +82,7 @@ class Executor:
                                   options=self._options)
         elif self._remote_type == "selenoid":
             if not self._executor_url:
-                self._executor_url = "http://localhost:4444/wd/hub"
+                self._executor_url = "http://192.168.0.105:4444/wd/hub"
             desired_cap = {
                 'browserName': self._browser,
                 # 'version': "65.0",
